@@ -1,0 +1,4 @@
+﻿  Source.cpp
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(160,52): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(184,63): warning C4305: 'argument' : troncation de 'double' à 'float'
+  ProjectData.vcxproj -> C:\Users\Thibaud\source\repos\ProjectData\Debug\ProjectData.exe
