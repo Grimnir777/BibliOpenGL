@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include "Arc.h"
+#include "Circle.h"
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -53,16 +55,14 @@ void fillVerticesCircle(float *vertices, int* indexes, float radius) {
         indexes[(i * 3)] = i;
         indexes[(i * 3) + 1] = 0;
         indexes[(i * 3) + 2] = i + 1;
-        cout << vertices[i * 2] << "," << vertices[(i * 2) + 1] << "\n";
+        //cout << vertices[i * 2] << "," << vertices[(i * 2) + 1] << "\n";
     }
-    vertices[360] = 0.5f;
-    vertices[361] = 0.0f;
 }
 
 void fillVerticesArc(float *vertices, int *indexes, float offsetAngle, float angle, float radius, float prof, float cx, float cy) {
     float radiusWithProf = radius + prof;
-    float realOffset = 2.0f * 3.1415926f * offsetAngle / 360;
-    float realAngle = 2.0f * 3.1415926f * angle /360;
+    float realOffset =  3.1415926f * offsetAngle / 180;
+    float realAngle = 2.0f * 3.1415926f * angle /180;
 
     for (int i = 0; i < NB_segments; i++)
     {
@@ -76,8 +76,6 @@ void fillVerticesArc(float *vertices, int *indexes, float offsetAngle, float ang
         indexes[(i * 3) + 1] = i + 1;
         indexes[(i * 3) + 2] = i + 2;
     }
-    vertices[720] = 0.5f;
-    vertices[720] = 0.0f;
 }
 
 
@@ -102,18 +100,18 @@ void compileShaders(int *vertexShader, int *fragmentShader, unsigned int *shader
     glDeleteShader(*fragmentShader);
 }
 
-void renderArc(float *verticesArc, int *indexesArc) {
-    unsigned int VBOArc = 0, VAOArc = 0, EBOArc = 0;
-    glGenBuffers(1, &VBOArc);
-    glGenBuffers(1, &EBOArc);
-    glGenVertexArrays(1, &VAOArc);
+void mapVerticesToBuffers(float* vertices,int size_of_vertices, int* indexes, int size_of_indexes, unsigned int *VBO, unsigned int *VAO, unsigned int *EBO) {
+    glGenBuffers(1, VBO);
+    glGenBuffers(1, EBO);
+    glGenVertexArrays(1, VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBOArc);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesArc), verticesArc, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOArc);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexesArc), indexesArc, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    glBufferData(GL_ARRAY_BUFFER, size_of_vertices, vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(VAOArc);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size_of_indexes, indexes, GL_STATIC_DRAW);
+
+    glBindVertexArray(*VAO);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -122,11 +120,111 @@ void renderArc(float *verticesArc, int *indexesArc) {
     glBindVertexArray(0);
 }
 
-void updateBuffer(int *VBO) {
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+void renderAll(
+    vector<unsigned int> VBOsArc,
+    vector<unsigned int> VAOsArc,
+    vector<unsigned int> EBOsArc,
+    vector<unsigned int> VBOsCircle,
+    vector<unsigned int> VAOsCircle,
+    vector<unsigned int> EBOsCircle,
+    unsigned int shaderProgram) {
+    glUseProgram(shaderProgram);
+    for (int i = 0; i < VBOsArc.size(); i++)
+    {
+        glUniform4f(glGetUniformLocation(shaderProgram, "colorInput"), 0.34f, 0.27f, 0.48f, 1.0f);
+        glBindVertexArray(VAOsArc.at(i));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOsArc.at(i));
+        glDrawElements(GL_TRIANGLES, (NB_segments * 5), GL_UNSIGNED_INT, 0);
+    }
+    for (int i = 0; i < VBOsCircle.size(); i++)
+    {
+        glUniform4f(glGetUniformLocation(shaderProgram, "colorInput"), 0.56f, 0.27f, 0.41f, 1.0f);
+        glBindVertexArray(VAOsCircle.at(i));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOsCircle.at(i));
+        glDrawElements(GL_TRIANGLES, (NB_segments * 3), GL_UNSIGNED_INT, 0);
+    }
 }
 
+void addCircle(
+    vector<unsigned int> *VBOs,
+    vector<unsigned int> *VAOs,
+    vector<unsigned int> *EBOs,
+    int nb_segments,
+    float radius) {
 
+    VBOs->push_back(0);
+    VAOs->push_back(0);
+    EBOs->push_back(0);
+
+    int size_vertices = nb_segments * 2;
+    int size_indexes = nb_segments * 3;
+    // 120 steps and 2 values for each step + center
+    float* verticesCircle = new float[size_vertices];
+    int* indexesCircle = new int[size_indexes];
+
+    fillVerticesCircle(verticesCircle, indexesCircle, radius);
+
+    mapVerticesToBuffers(
+        verticesCircle,
+        size_vertices * sizeof(float),
+        indexesCircle,
+        size_indexes * sizeof(int),
+        &VBOs->back(),
+        &VAOs->back(),
+        &EBOs->back());
+}
+
+void addArc(
+    vector<unsigned int>* VBOs,
+    vector<unsigned int>* VAOs,
+    vector<unsigned int>* EBOs,
+    int nb_segments,
+    float radius,
+    float prof,
+    float offset_angle,
+    float angle) {
+
+    VBOs->push_back(0);
+    VAOs->push_back(0);
+    EBOs->push_back(0);
+
+    int size_vertices = nb_segments * 4;
+    int size_indexes = nb_segments * 3;
+
+    cout << "size of vertices " << size_vertices * sizeof(float)  << endl;
+    cout << "size of indexes " << size_indexes * sizeof(int) << endl;
+
+    float* verticesArc = new float[size_vertices];
+    int* indexesArc = new int[size_indexes];
+
+    fillVerticesArc(verticesArc, indexesArc, offset_angle, angle, radius, prof, 0, 0);
+
+    mapVerticesToBuffers(
+        verticesArc,
+        (size_vertices * sizeof(float)),
+        indexesArc,
+        (size_indexes * sizeof(int)),
+        &VBOs->back(),
+        &VAOs->back(),
+        &EBOs->back());
+}
+
+// to make random value between 0 and 1
+//static_cast <float> (rand()) / static_cast <float> (RAND_MAX)
+
+
+void makeArcs(
+    vector<unsigned int>* VBOs,
+    vector<unsigned int>* VAOs,
+    vector<unsigned int>* EBOs,
+    int nbArc) {
+    float arcAngle = (float) 360 / nbArc;
+    cout << arcAngle << endl;
+    for (int i = 0; i < nbArc; i++)
+    {
+        addArc(VBOs, VAOs, EBOs, NB_segments, 0.52, 0.2, (i * arcAngle) + 1, arcAngle - 1);
+    }
+}
 
 int main()
 {
@@ -158,53 +256,17 @@ int main()
     unsigned int shaderProgram;
     compileShaders(&vertexShader, &fragmentShader, &shaderProgram);
 
-    // 120 steps and 2 values for each step + center
-    float verticesArc[242];
-    int indexesArc[360];
-    fillVerticesCircle(verticesArc,indexesArc, 0.45);
+    vector<unsigned int> VBOsCircle;
+    vector<unsigned int> VAOsCircle;
+    vector<unsigned int> EBOsCircle;
+    
+    vector<unsigned int> VBOsArc;
+    vector<unsigned int> VAOsArc;
+    vector<unsigned int> EBOsArc;
 
 
-    unsigned int VBOArc = 0, VAOArc = 0, EBOArc = 0;
-    glGenBuffers(1, &VBOArc);
-    glGenBuffers(1, &EBOArc);
-    glGenVertexArrays(1, &VAOArc);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBOArc);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesArc), verticesArc, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOArc);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexesArc), indexesArc, GL_STATIC_DRAW);
-
-    glBindVertexArray(VAOArc);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    //unbind 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    // Arc
-    float vertices[482];
-    int indexes[720];
-    fillVerticesArc(vertices, indexes, 40, 260, 0.5, 0.2, 0, 0);
-
-    unsigned int VBO=0, VAO=0, EBO=0;
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    glGenVertexArrays(1, &VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
-
-    glBindVertexArray(VAO);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    //unbind 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-   
+    addCircle(&VBOsCircle, &VAOsCircle, &EBOsCircle, NB_segments, 0.5);
+    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc, 26 );
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -213,28 +275,10 @@ int main()
         glClearColor(0,0,0, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        // Circle Render
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "colorInput");
-        glUniform4f(vertexColorLocation, 0.33f, 0.36f, 0.43f, 1.0f);
-        glBindVertexArray(VAOArc);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOArc);
-        glDrawElements(GL_TRIANGLES, (NB_segments * 3)-1, GL_UNSIGNED_INT, 0);
-
-
-        //Arc render
-        glUseProgram(shaderProgram);
-        int vertexColorLocation2 = glGetUniformLocation(shaderProgram, "colorInput");
-        glUniform4f(vertexColorLocation2, 0.34f, 0.27f, 0.48f, 1.0f);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, NB_segments * 5, GL_UNSIGNED_INT, 0);
-
+        renderAll(VBOsArc,VAOsArc,EBOsArc, VBOsCircle, VAOsCircle, EBOsCircle, shaderProgram);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
     glfwTerminate();
     return 0;
 }
