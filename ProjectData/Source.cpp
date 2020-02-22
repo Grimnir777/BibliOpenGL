@@ -231,6 +231,16 @@ void makeArcs(
 int main()
 {
     Data data = Data("articles_data.db");
+    vector<string> vec = data.get_first_ls(2015);
+    for (auto i : vec)
+        std::cout << i << ' ';
+    vec = data.get_first_2ls(2015,"a");
+    for (auto i : vec)
+        std::cout << i << ' ';
+    vec = data.get_first_words(2015, "an");
+    for (auto i : vec)
+        std::cout << i << ' ';
+
     /*
     // glfw: initialize and configure
     glfwInit();
