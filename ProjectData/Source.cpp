@@ -5,6 +5,8 @@
 #include <math.h>
 #include "Arc.h"
 #include "Circle.h"
+#include "Data.h"
+#include "sqlite3.h"
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -222,12 +224,14 @@ void makeArcs(
     cout << arcAngle << endl;
     for (int i = 0; i < nbArc; i++)
     {
-        addArc(VBOs, VAOs, EBOs, NB_segments, 0.52, 0.2, (i * arcAngle) + 1, arcAngle - 1);
+        addArc(VBOs, VAOs, EBOs, NB_segments, 0.22, 0.7, (i * arcAngle) + 1, arcAngle - 1);
     }
 }
 
 int main()
 {
+    Data data = Data("articles_data.db");
+    /*
     // glfw: initialize and configure
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -265,8 +269,8 @@ int main()
     vector<unsigned int> EBOsArc;
 
 
-    addCircle(&VBOsCircle, &VAOsCircle, &EBOsCircle, NB_segments, 0.5);
-    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc, 26 );
+    addCircle(&VBOsCircle, &VAOsCircle, &EBOsCircle, NB_segments, 0.2);
+    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc, 111 );
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -280,6 +284,12 @@ int main()
         glfwPollEvents();
     }
     glfwTerminate();
+    */
+    do
+    {
+        cout << '\n' << "Press a key to continue...";
+    } while (cin.get() != '\n');
+
     return 0;
 }
 
