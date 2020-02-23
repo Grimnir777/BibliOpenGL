@@ -1,13 +1,36 @@
+
+#include "App.h"
+
+int main() {
+    App app;
+    app.run();
+    return 0;
+}
+
+
+
+/*
+
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#include "Data.h"
+#include "Shader.h"
+#include "Camera.h"
+
 #include <iostream>
 #include <vector>
 #include <math.h>
 #include "Arc.h"
 #include "Circle.h"
-#include "Data.h"
 #include "sqlite3.h"
 using namespace std;
+
+
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -308,13 +331,8 @@ int main()
 
     
     addCircle(&VBOsCircle, &VAOsCircle, &EBOsCircle, NB_segments, 0.18);
-    /*
-    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc, vec.size(), 0, 360, 0.44, 0.06);
-    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc,4 , 0, 45, 0.51, 0.06);
-    
-    */
     fillScene(data, &VBOsArc, &VAOsArc, &EBOsArc, 2015);
-
+    Shader ourShader("basic_shader.vs", "basic_shader.fs");
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -327,14 +345,6 @@ int main()
         glfwPollEvents();
     }
     glfwTerminate();
-    
-    /*
-    do
-    {
-        cout << '\n' << "Press a key to continue...";
-    } while (cin.get() != '\n');
-    */
-    
     return 0;
 }
 
@@ -367,3 +377,5 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
+
+*/

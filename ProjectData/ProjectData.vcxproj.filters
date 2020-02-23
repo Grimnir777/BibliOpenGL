@@ -42,6 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="basic_shader.vs">
+      <Filter>Fichiers sources</Filter>
+    </None>
+    <None Include="basic_shader.fs">
+      <Filter>Fichiers sources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arc.h">
@@ -62,5 +68,22 @@
     <ClInclude Include="App.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="awesomeface.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="container.jpg">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
   </ItemGroup>
 </Project>
