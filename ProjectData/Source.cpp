@@ -193,8 +193,8 @@ void addArc(
     int size_vertices = nb_segments * 4;
     int size_indexes = nb_segments * 3;
 
-    cout << "size of vertices " << size_vertices * sizeof(float)  << endl;
-    cout << "size of indexes " << size_indexes * sizeof(int) << endl;
+    //cout << "size of vertices " << size_vertices * sizeof(float)  << endl;
+    //cout << "size of indexes " << size_indexes * sizeof(int) << endl;
 
     float* verticesArc = new float[size_vertices];
     int* indexesArc = new int[size_indexes];
@@ -215,33 +215,61 @@ void addArc(
 //static_cast <float> (rand()) / static_cast <float> (RAND_MAX)
 
 
-void makeArcs(
+float makeArcs(
     vector<unsigned int>* VBOs,
     vector<unsigned int>* VAOs,
     vector<unsigned int>* EBOs,
-    int nbArc) {
-    float arcAngle = (float) 360 / nbArc;
-    cout << arcAngle << endl;
+    int nbArc,
+    float startAngle,
+    float endAngle,
+    float radius,
+    float prof) {
+    float arcAngle = (float) (endAngle - startAngle) / nbArc;
+
+    cout << "start " << startAngle << " ; end " << endAngle << "  ; arcAngle " <<  arcAngle << "  ; seperate " << (arcAngle / 5) << endl;
     for (int i = 0; i < nbArc; i++)
     {
-        addArc(VBOs, VAOs, EBOs, NB_segments, 0.22, 0.7, (i * arcAngle) + 1, arcAngle - 1);
+        addArc(VBOs, VAOs, EBOs, NB_segments, radius, prof, (i * arcAngle) + startAngle + (arcAngle/5), (arcAngle)  - (arcAngle / 5));
+    }
+    return arcAngle;
+}
+
+
+void fillScene(
+    const Data data,
+    vector<unsigned int>* VBOs,
+    vector<unsigned int>* VAOs,
+    vector<unsigned int>* EBOs,
+    int year
+)
+{
+
+    float  firstLetterAngle = makeArcs(VBOs, VAOs, EBOs, data.first_ls.size(), 0, 360, 0.20, 0.2);
+    int indexSecondL = 0;
+    int indexFirstL = 0;
+    int subsize2l = 0;
+    cout << firstLetterAngle <<"\n";
+    while (indexSecondL < data.first_2ls.size() && indexFirstL < data.first_ls.size())
+    {
+        while (data.first_2ls[indexSecondL].substr(0, 1) == data.first_ls[indexFirstL] && indexSecondL < data.first_2ls.size()) {
+            //cout << data.first_2ls[indexSecondL] << "\n";
+            indexSecondL++;
+            subsize2l++;
+        }
+        if (subsize2l != 0) {
+            cout << "subsize : " << subsize2l << "\n";
+        float  secondLetterAngle = makeArcs(VBOs, VAOs, EBOs, subsize2l, (indexFirstL * firstLetterAngle) + (firstLetterAngle/5), ((indexFirstL + 1) * firstLetterAngle) - (firstLetterAngle / 5), 0.42, 0.2);
+
+        }
+        subsize2l = 0;
+        indexFirstL++;
     }
 }
 
 int main()
 {
     Data data = Data("articles_data.db");
-    vector<string> vec = data.get_first_ls(2015);
-    for (auto i : vec)
-        std::cout << i << ' ';
-    vec = data.get_first_2ls(2015,"a");
-    for (auto i : vec)
-        std::cout << i << ' ';
-    vec = data.get_first_words(2015, "an");
-    for (auto i : vec)
-        std::cout << i << ' ';
 
-    /*
     // glfw: initialize and configure
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -278,9 +306,14 @@ int main()
     vector<unsigned int> VAOsArc;
     vector<unsigned int> EBOsArc;
 
-
-    addCircle(&VBOsCircle, &VAOsCircle, &EBOsCircle, NB_segments, 0.2);
-    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc, 111 );
+    
+    addCircle(&VBOsCircle, &VAOsCircle, &EBOsCircle, NB_segments, 0.18);
+    /*
+    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc, vec.size(), 0, 360, 0.44, 0.06);
+    makeArcs(&VBOsArc, &VAOsArc, &EBOsArc,4 , 0, 45, 0.51, 0.06);
+    
+    */
+    fillScene(data, &VBOsArc, &VAOsArc, &EBOsArc, 2015);
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -294,12 +327,14 @@ int main()
         glfwPollEvents();
     }
     glfwTerminate();
-    */
+    
+    /*
     do
     {
         cout << '\n' << "Press a key to continue...";
     } while (cin.get() != '\n');
-
+    */
+    
     return 0;
 }
 
@@ -327,7 +362,6 @@ void processInput(GLFWwindow* window)
         cout << "key down pressed" << endl;
     }
 }
-
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

@@ -1,5 +1,11 @@
 ﻿  Source.cpp
 C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(134,23): warning C4018: '<' : incompatibilité signed/unsigned
 C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(141,23): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(227,90): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(247,97): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(252,25): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(252,64): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(254,104): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(261,205): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\Source.cpp(310,71): warning C4305: 'argument' : troncation de 'double' à 'float'
+LINK : warning LNK4098: conflit entre la bibliothÞque par dÚfaut 'MSVCRT' et les autres bibliothÞquesá; utilisez /NODEFAULTLIB:library
   ProjectData.vcxproj -> C:\Users\Thibaud\source\repos\ProjectData\Debug\ProjectData.exe

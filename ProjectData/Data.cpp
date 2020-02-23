@@ -9,16 +9,24 @@ Data::Data(string path)
 	cout << "Data constructor called";
 	this->dir = path;
     cout << this->dir <<"\n";
-    sqlite3* DB;
     int exit = 0;
-    exit = sqlite3_open(this->dir.c_str(), &DB);
+    exit = sqlite3_open(this->dir.c_str(), &this->DB);
     if (exit) {
-        std::cerr << "Error open DB " << sqlite3_errmsg(DB) << std::endl;
+        std::cerr << "Error open DB " << sqlite3_errmsg(this->DB) << std::endl;
         return;
     }
     else
         std::cout << "Opened Database Successfully!" << std::endl;
-    sqlite3_close(DB);
+    this->first_ls = this->get_first_ls();
+    this->first_2ls = this->get_first_2ls();
+    this->first_words = this->get_first_words();
+}
+
+
+Data::~Data()
+{
+    cout << "Data destructor called";
+    sqlite3_close(this->DB);
 }
 
 static int callbackDB(void* ptr, int argc, char** argv, char** cols)
@@ -30,25 +38,12 @@ static int callbackDB(void* ptr, int argc, char** argv, char** cols)
 
 void Data::executeSQL(const char* sql)
 {
-    vector<string> res;
-    sqlite3* db;
     char* zErrMsg = 0;
     int rc;
     const char* data = "Callback function called";
 
-    /* Open database */
-    rc = sqlite3_open(this->dir.c_str(), &db);
-
-    if (rc) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-    else {
-        fprintf(stderr, "Opened database successfully\n");
-    }
-
     /* Execute SQL statement */
-    rc = sqlite3_exec(db, sql, callbackDB, &this->results, &zErrMsg);
+    rc = sqlite3_exec(this->DB, sql, callbackDB, &this->results, &zErrMsg);
 
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -57,9 +52,44 @@ void Data::executeSQL(const char* sql)
     else {
         fprintf(stdout, "Operation done successfully\n");
     }
-    sqlite3_close(db);
 }
 
+
+vector<string> Data::get_first_ls()
+{
+    this->results.clear();
+    const char* sql = R"""(
+                select first_l from fos group by first_l order by first_l
+                )""";
+
+    this->executeSQL(sql);
+    return this->results;
+}
+
+vector<string> Data::get_first_2ls()
+{
+    this->results.clear();
+    const char* sql = R"""(
+                select first_2l from fos group by first_2l order by first_2l
+                )""";
+
+    this->executeSQL(sql);
+    return this->results;
+}
+
+vector<string> Data::get_first_words()
+{
+    this->results.clear();
+    const char* sql = R"""(
+                select first_word from fos group by first_word order by first_word
+                )""";
+
+    this->executeSQL(sql);
+    return this->results;
+}
+
+
+/*
 vector<string> Data::get_first_ls(int year)
 {
     this->results.clear();
@@ -71,7 +101,6 @@ vector<string> Data::get_first_ls(int year)
     string part2 = "where a.year = " + to_string(year) + " ";
     string part3 = "group by fos.first_l order by fos.first_l";
     sql = part1 + part2 + part3;
-    cout << sql << endl;
     this->executeSQL(sql.c_str());
     return this->results;
 }
@@ -105,3 +134,4 @@ vector<string> Data::get_first_words(int year, string first_2l)
     this->executeSQL(sql.c_str());
     return this->results;
 }
+*/

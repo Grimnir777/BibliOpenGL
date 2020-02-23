@@ -1,18 +1,24 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "sqlite3.h"
 using namespace std;
 
 class Data
 {
 public:
 	Data(string path);
-	vector<string> get_first_ls(int year);
-	vector<string> get_first_2ls(int year, string first_l);
-	vector<string> get_first_words(int year, string first_2l);
+	~Data();
+	vector<string> get_first_ls();
+	vector<string> get_first_2ls();
+	vector<string> get_first_words();
+	vector<string> first_ls;
+	vector<string> first_2ls;
+	vector<string> first_words;
 private:
-	void callback(void* data, int argc, char** argv, char** azColName);
+	sqlite3* DB;
 	string dir;
 	vector<string> results;
+
 	void executeSQL(const char* sql);
 };
