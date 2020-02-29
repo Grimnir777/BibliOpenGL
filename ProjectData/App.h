@@ -91,7 +91,7 @@ public:
 
 
 
-        Shader ourShader("basic_shader.vs", "basic_shader.fs");
+        Shader objectShader("basic_shader.vs", "basic_shader.fs");
 
         Shader lampShader("lighting_shader.vs", "lighting_shader.fs");
 
@@ -169,11 +169,11 @@ public:
 
 
         addArc(0, 45, 0.5, 0.2, 0.2);
-        addArc(50, 45, 0.5, 0.2, 0.2);
-        addArc(100, 45, 0.5, 0.2, 0.2);
-        addArc(150, 45, 0.5, 0.2, 0.2);
+        //addArc(50, 45, 0.5, 0.2, 0.2);
+        //addArc(100, 45, 0.5, 0.2, 0.2);
+        //addArc(150, 45, 0.5, 0.2, 0.2);
 
-        ourShader.use();
+        objectShader.use();
 
         //Render loop
         while (!glfwWindowShouldClose(window))
@@ -207,7 +207,7 @@ public:
             glBindVertexArray(lightVAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            renderAll(ourShader);
+            renderAll(objectShader);
 
             glfwSwapBuffers(window);
             glfwPollEvents();
@@ -232,76 +232,181 @@ private:
 
 
 
-    void fillVerticesArc(float* vertices, int* indexes, float offsetAngle, float angle, float radius, float prof, float high) {
+    vector<glm::vec3> fillVerticesArc(float offsetAngle, float angle, float radius, float prof, float high) {
         float radiusWithProf = radius + prof;
         float realOffset = 3.1415926f * offsetAngle / 180;
         float realAngle = 2.0f * 3.1415926f * angle / 180;
-
+        vector<glm::vec3> points;
+        vector<glm::vec3> finalVertices;
         for (int i = 0; i < NB_segments; i++)
         {
-            // First point low and near
-            vertices[i * 12] = (radius * cos((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 1] = (radius * sin((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 2] = 0.0f;
+            points.push_back(glm::vec3((radius * cos((i * realAngle / NB_segments) + realOffset)), (radius * sin((i * realAngle / NB_segments) + realOffset)), 0.0f));
+            points.push_back(glm::vec3((radiusWithProf * cos((i * realAngle / NB_segments) + realOffset)), (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset)), 0.0f));
+            points.push_back(glm::vec3((radius * cos((i * realAngle / NB_segments) + realOffset)), (radius * sin((i * realAngle / NB_segments) + realOffset)), high));
+            points.push_back(glm::vec3((radiusWithProf * cos((i * realAngle / NB_segments) + realOffset)), (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset)), high));
+        }
 
-            // Second point low and far
-            vertices[(i * 12) + 3] = (radiusWithProf * cos((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 4] = (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 5] = 0.0f;
+        //Side of arc #1
+        glm::vec3 n = this->normal(points.at(2) - points.at(0), points.at(1) - points.at(0));
+        // Fill
+        finalVertices.push_back(points.at(0));
+        finalVertices.push_back(n);
 
-            // Third point high and near
-            vertices[(i * 12) + 6] = (radius * cos((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 7] = (radius * sin((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 8] = high;
+        finalVertices.push_back(points.at(1));
+        finalVertices.push_back(n);
 
-            // Second point low and far
-            vertices[(i * 12) + 9] = (radiusWithProf * cos((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 10] = (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset));
-            vertices[(i * 12) + 11] = high;
+        finalVertices.push_back(points.at(2));
+        finalVertices.push_back(n);
+
+        n = this->normal(points.at(1) - points.at(3), points.at(2) - points.at(3));
+        // Fill
+        finalVertices.push_back(points.at(1));
+        finalVertices.push_back(n);
+
+        finalVertices.push_back(points.at(2));
+        finalVertices.push_back(n);
+
+        finalVertices.push_back(points.at(3));
+        finalVertices.push_back(n);
 
 
-            // Indexes 8*3 = 24 triangles per iteration 
-            // 1st triangle
-            indexes[(i * 24)] = i;
-            indexes[(i * 24) + 1] = i + 4;
-            indexes[(i * 24) + 2] = i + 1;
 
-            // 2nd triangle
-            indexes[(i * 24) + 3] = i + 1;
-            indexes[(i * 24) + 4] = i + 4;
-            indexes[(i * 24) + 5] = i + 5;
+        for (int i = 0; i < NB_segments - 1 ; i++)
+        {
+            cout << "itération : " << i << endl;
+            // Pour 1 Segment : 8 triangles
+                // Pour 1 triangle : 3 vertices 
+                    // Pour 1 vertices 3 composants x,y,z et 3 comp de la normale x,y,z
+            //1st triangle 0 4 1
+            // calcul normal
+            glm::vec3 n = this->normal(points.at((i * 4) + 1) - points.at((i * 4) + 0), points.at((i * 4) + 4) - points.at((i * 4) + 0));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 0));
+            finalVertices.push_back(n);
 
-            // 3rd triangle
-            indexes[(i * 24) + 6] = i + 5;
-            indexes[(i * 24) + 7] = i + 1;
-            indexes[(i * 24) + 8] = i + 3;
+            finalVertices.push_back(points.at((i * 4) + 4));
+            finalVertices.push_back(n);
 
-            // 4th triangle
-            indexes[(i * 24) + 9] = i + 3;
-            indexes[(i * 24) + 10] = i + 5;
-            indexes[(i * 24) + 11] = i + 7;
+            finalVertices.push_back(points.at((i * 4) + 1));
+            finalVertices.push_back(n);
 
-            // 5th triangle
-            indexes[(i * 24) + 12] = i + 7;
-            indexes[(i * 24) + 13] = i + 6;
-            indexes[(i * 24) + 14] = i + 3;
+            // 2nd triangle 1 4 5
+            n = this->normal(points.at((i * 4) + 4) - points.at((i * 4) + 5), points.at((i * 4) + 1) - points.at((i * 4) + 5));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 1));
+            finalVertices.push_back(n);
 
-            // 6th triangle
-            indexes[(i * 24) + 15] = i + 3;
-            indexes[(i * 24) + 16] = i + 6;
-            indexes[(i * 24) + 17] = i + 2;
+            finalVertices.push_back(points.at((i * 4) + 4));
+            finalVertices.push_back(n);
 
-            // 7th triangle
-            indexes[(i * 24) + 18] = i + 2;
-            indexes[(i * 24) + 19] = i + 6;
-            indexes[(i * 24) + 20] = i + 4;
+            finalVertices.push_back(points.at((i * 4) + 5));
+            finalVertices.push_back(n);
 
-            // 8th triangle
-            indexes[(i * 24) + 21] = i + 4;
-            indexes[(i * 24) + 22] = i + 2;
-            indexes[(i * 24) + 23] = i + 0;
+            // 3rd triangle 5 1 3
+            n = this->normal(points.at((i * 4) + 5) - points.at((i * 4) + 1), points.at((i * 4) + 3) - points.at((i * 4) + 1));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 5));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 1));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 3));
+            finalVertices.push_back(n);
+
+            // 4th triangle 3 5 7
+            n = this->normal(points.at((i * 4) + 3) - points.at((i * 4) + 7), points.at((i * 4) + 5) - points.at((i * 4) + 7));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 3));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 5));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 7));
+            finalVertices.push_back(n);
+
+
+            // 5th triangle 7 6 3
+            n = this->normal(points.at((i * 4) + 6) - points.at((i * 4) + 7), points.at((i * 4) + 3) - points.at((i * 4) + 7));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 7));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 6));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 3));
+            finalVertices.push_back(n);
+
+
+            // 6th triangle 3 6 2
+            n = this->normal(points.at((i * 4) + 3) - points.at((i * 4) + 2), points.at((i * 4) + 6) - points.at((i * 4) + 2));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 3));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 6));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 2));
+            finalVertices.push_back(n);
+
+            // 7th triangle 2 6 4
+            n = this->normal(points.at((i * 4) + 2) - points.at((i * 4) + 6), points.at((i * 4) + 4) - points.at((i * 4) + 6));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 2));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 6));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 4));
+            finalVertices.push_back(n);
+
+            // 8th triangle 4 2 0
+            n = this->normal(points.at((i * 4) + 4) - points.at((i * 4) + 0), points.at((i * 4) + 2) - points.at((i * 4) + 0));
+            // Fill
+            finalVertices.push_back(points.at((i * 4) + 4));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 2));
+            finalVertices.push_back(n);
+
+            finalVertices.push_back(points.at((i * 4) + 0));
+            finalVertices.push_back(n);
 
         }
+
+        //Side of arc #1
+        n = this->normal(points.at(((NB_segments-1) * 4) + 1) - points.at(((NB_segments - 1) * 4) + 0), points.at(((NB_segments - 1) * 4) + 2) - points.at(((NB_segments - 1) * 4) + 0));
+        // Fill
+        finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 0));
+        finalVertices.push_back(n);
+
+        finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 1));
+        finalVertices.push_back(n);
+
+        finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 2));
+        finalVertices.push_back(n);
+
+        n = this->normal(points.at(((NB_segments - 1) * 4) + 2) - points.at(((NB_segments - 1) * 4) + 3), points.at(((NB_segments - 1) * 4) + 1) - points.at(((NB_segments - 1) * 4) + 3));
+        // Fill
+        finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 1));
+        finalVertices.push_back(n);
+
+        finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 2));
+        finalVertices.push_back(n);
+
+        finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 3));
+        finalVertices.push_back(n);
+
+        return finalVertices;
+
+    }
+
+    glm::vec3 normal(glm::vec3 v1, glm::vec3 v2) {
+        return glm::normalize(glm::cross(v1, v2));
     }
 
     void mapVerticesToBuffers(float* vertices, int size_of_vertices, int* indexes, int size_of_indexes) {
@@ -335,28 +440,50 @@ private:
 
         this->VBOsArc.push_back(0);
         this->VAOsArc.push_back(0);
-        this->EBOsArc.push_back(0);
+       // this->EBOsArc.push_back(0);
 
-        int size_vertices = this->NB_segments * 3 * 4; // 3D and 4 points per iteration
-        int size_indexes = this->NB_segments * 8 * 3;  // 8 triangles composed by 3 point indexes
+        //int size_vertices = this->NB_segments * 3 * 4; // 3D and 4 points per iteration
+        //int size_indexes = this->NB_segments * 8 * 3;  // 8 triangles composed by 3 point indexes
 
-        cout << "Arc params ; size_vertices :  " << size_vertices << " ; size_indexes :  " << size_indexes;
-        float* verticesArc = new float[size_vertices];
-        int* indexesArc = new int[size_indexes];
+       // cout << "Arc params ; size_vertices :  " << size_vertices << " ; size_indexes :  " << size_indexes;
+        //float* verticesArc = new float[size_vertices];
+        //int* indexesArc = new int[size_indexes];
 
-        fillVerticesArc(verticesArc, indexesArc, offset_angle, angle, radius, prof, high);
+        vector<glm::vec3> vertices = fillVerticesArc(offset_angle, angle, radius, prof, high);
+        glGenBuffers(1, &this->VBOsArc.back());
+        glGenVertexArrays(1, &this->VAOsArc.back());
 
+        glBindBuffer(GL_ARRAY_BUFFER, this->VBOsArc.back());
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+
+        glBindVertexArray(this->VAOsArc.back());
+
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        // normal attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        //unbind 
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        /*
         mapVerticesToBuffers(
             verticesArc,
             (size_vertices * sizeof(float)),
             indexesArc,
             (size_indexes * sizeof(int)));
+        */
     }
 
     void renderAll(Shader ourShader) {
         ourShader.use();
         ourShader.setVec3("objectColor", glm::vec3(0.34f, 0.27f, 0.48f));
         ourShader.setVec3("lightColor", glm::vec3(1.0f));
+        ourShader.setVec3("lightPos", lightPos);
+        ourShader.setVec3("viewPos", camera.Position);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
@@ -368,7 +495,7 @@ private:
         for (int i = 0; i < VBOsArc.size(); i++)
         {
             glBindVertexArray(VAOsArc.at(i));
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOsArc.at(i));
+            //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOsArc.at(i));
 
             // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
@@ -377,8 +504,8 @@ private:
             //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 1.0f, 1.0f));
             ourShader.setMat4("model", model);
 
-            //glDrawArrays(GL_TRIANGLES, 0, 3*8);
-            glDrawElements(GL_TRIANGLES, (NB_segments * 24), GL_UNSIGNED_INT, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 3*8 * 120);
+            //glDrawElements(GL_TRIANGLES, (NB_segments * 24), GL_UNSIGNED_INT, 0);
         }
     }
 
