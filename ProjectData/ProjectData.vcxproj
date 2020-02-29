@@ -90,7 +90,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Thibaud\source\repos\ProjectData\ProjectData\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thibaud\source\repos\ProjectData\ProjectData\glm;C:\Users\Thibaud\source\repos\ProjectData\ProjectData\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,7 +155,11 @@
   <ItemGroup>
     <None Include="basic_shader.fs" />
     <None Include="basic_shader.vs" />
+    <None Include="lighting_shader.fs" />
+    <None Include="lighting_shader.vs" />
     <None Include="packages.config" />
+    <None Include="text_shader.fs" />
+    <None Include="text_shader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />

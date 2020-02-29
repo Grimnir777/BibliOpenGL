@@ -1,19 +1,24 @@
 #pragma once
+//Basic stuff
+#include <iostream>
+#include <vector>
+#include <math.h>
+#include <map>
+
+//OpenGL
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+//Custom
 #include "Data.h"
 #include "Shader.h"
 #include "Camera.h"
 
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include "Arc.h"
-#include "Circle.h"
+//Others
 #include "sqlite3.h"
+
 using namespace std;
 
 
@@ -35,7 +40,7 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 class App
 {
@@ -58,6 +63,7 @@ public:
             return;
         }
         glfwMakeContextCurrent(window);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
@@ -73,19 +79,103 @@ public:
 
         glEnable(GL_DEPTH_TEST);
 
+
+
+        double time = 0, dt;// Current time and enlapsed time
+        double turn = 0;    // Model turn counter
+        double speed = 0.3; // Model rotation speed
+        int wire = 0;       // Draw model in wireframe?
+        float bgColor[] = { 0.1f, 0.2f, 0.4f };         // Background color 
+        unsigned char cubeColor[] = { 255, 0, 0, 128 }; // Model color (32bits RGBA)
+
+
+
+
         Shader ourShader("basic_shader.vs", "basic_shader.fs");
 
+        Shader lampShader("lighting_shader.vs", "lighting_shader.fs");
 
 
-        addArc(90.0, 180.0, 0.5, 1, 1);
 
-      
 
-        // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-        // -------------------------------------------------------------------------------------------
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        float vertices[] = {
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+        };
+        // first, configure the cube's VAO (and VBO)
+        unsigned int VBO, cubeVAO;
+        glGenVertexArrays(1, &cubeVAO);
+        glGenBuffers(1, &VBO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindVertexArray(cubeVAO);
+
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+        unsigned int lightVAO;
+        glGenVertexArrays(1, &lightVAO);
+        glBindVertexArray(lightVAO);
+
+        // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+
+        addArc(0, 45, 0.5, 0.2, 0.2);
+        addArc(50, 45, 0.5, 0.2, 0.2);
+        addArc(100, 45, 0.5, 0.2, 0.2);
+        addArc(150, 45, 0.5, 0.2, 0.2);
+
         ourShader.use();
-        // render loop
-        // -----------
+
+        //Render loop
         while (!glfwWindowShouldClose(window))
         {
             float currentFrame = glfwGetTime();
@@ -94,8 +184,28 @@ public:
 
             processInput(window);
 
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+
+            // view/projection transformations
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            glm::mat4 view = camera.GetViewMatrix();
+
+            // world transformation
+            glm::mat4 model = glm::mat4(1.0f);
+
+            // also draw the lamp object
+            lampShader.use();
+            lampShader.setMat4("projection", projection);
+            lampShader.setMat4("view", view);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, lightPos);
+            model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+            lampShader.setMat4("model", model);
+
+            glBindVertexArray(lightVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
 
             renderAll(ourShader);
 
@@ -103,7 +213,8 @@ public:
             glfwPollEvents();
         }
 
-        glDeleteVertexArrays(1, &VAO);
+        glDeleteVertexArrays(1, &cubeVAO);
+        glDeleteVertexArrays(1, &lightVAO);
         glDeleteBuffers(1, &VBO);
 
         glfwTerminate();
@@ -114,7 +225,6 @@ private:
 
     // Data data = Data("articles_data.db");
     int NB_segments;
-    unsigned int VBO, VAO;
 
     vector<unsigned int> VBOsArc;
     vector<unsigned int> VAOsArc;
@@ -153,8 +263,8 @@ private:
             // Indexes 8*3 = 24 triangles per iteration 
             // 1st triangle
             indexes[(i * 24)] = i;
-            indexes[(i * 24) + 1] = i + 1;
-            indexes[(i * 24) + 2] = i + 4;
+            indexes[(i * 24) + 1] = i + 4;
+            indexes[(i * 24) + 2] = i + 1;
 
             // 2nd triangle
             indexes[(i * 24) + 3] = i + 1;
@@ -162,34 +272,34 @@ private:
             indexes[(i * 24) + 5] = i + 5;
 
             // 3rd triangle
-            indexes[(i * 24) + 6] = i + 2;
-            indexes[(i * 24) + 7] = i + 3;
-            indexes[(i * 24) + 8] = i + 6;
+            indexes[(i * 24) + 6] = i + 5;
+            indexes[(i * 24) + 7] = i + 1;
+            indexes[(i * 24) + 8] = i + 3;
 
             // 4th triangle
             indexes[(i * 24) + 9] = i + 3;
-            indexes[(i * 24) + 10] = i + 6;
+            indexes[(i * 24) + 10] = i + 5;
             indexes[(i * 24) + 11] = i + 7;
 
             // 5th triangle
-            indexes[(i * 24) + 12] = i + 0;
-            indexes[(i * 24) + 13] = i + 2;
-            indexes[(i * 24) + 14] = i + 4;
+            indexes[(i * 24) + 12] = i + 7;
+            indexes[(i * 24) + 13] = i + 6;
+            indexes[(i * 24) + 14] = i + 3;
 
             // 6th triangle
-            indexes[(i * 24) + 15] = i + 2;
-            indexes[(i * 24) + 16] = i + 4;
-            indexes[(i * 24) + 17] = i + 6;
+            indexes[(i * 24) + 15] = i + 3;
+            indexes[(i * 24) + 16] = i + 6;
+            indexes[(i * 24) + 17] = i + 2;
 
             // 7th triangle
-            indexes[(i * 24) + 18] = i + 1;
-            indexes[(i * 24) + 19] = i + 3;
-            indexes[(i * 24) + 20] = i + 5;
+            indexes[(i * 24) + 18] = i + 2;
+            indexes[(i * 24) + 19] = i + 6;
+            indexes[(i * 24) + 20] = i + 4;
 
             // 8th triangle
-            indexes[(i * 24) + 21] = i + 3;
-            indexes[(i * 24) + 22] = i + 5;
-            indexes[(i * 24) + 23] = i + 7;
+            indexes[(i * 24) + 21] = i + 4;
+            indexes[(i * 24) + 22] = i + 2;
+            indexes[(i * 24) + 23] = i + 0;
 
         }
     }
@@ -242,14 +352,12 @@ private:
             indexesArc,
             (size_indexes * sizeof(int)));
     }
-    /*
-	// OpenGL functions
 
-	void renderAll();
-*/
     void renderAll(Shader ourShader) {
         ourShader.use();
-        ourShader.setVec4("colorInput", glm::vec4(0.34f, 0.27f, 0.48f, 1.0f));
+        ourShader.setVec3("objectColor", glm::vec3(0.34f, 0.27f, 0.48f));
+        ourShader.setVec3("lightColor", glm::vec3(1.0f));
+
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
 
@@ -275,6 +383,8 @@ private:
     }
 
 };
+
+
 
 /*
     -- External --

@@ -48,6 +48,18 @@
     <None Include="basic_shader.fs">
       <Filter>Fichiers sources</Filter>
     </None>
+    <None Include="lighting_shader.fs">
+      <Filter>Fichiers sources</Filter>
+    </None>
+    <None Include="lighting_shader.vs">
+      <Filter>Fichiers sources</Filter>
+    </None>
+    <None Include="text_shader.vs">
+      <Filter>Fichiers sources</Filter>
+    </None>
+    <None Include="text_shader.fs">
+      <Filter>Fichiers sources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arc.h">

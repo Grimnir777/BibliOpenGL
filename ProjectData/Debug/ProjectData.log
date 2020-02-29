@@ -1,11 +1,16 @@
 ﻿  Source.cpp
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(91,32): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(272,27): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(319,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(320,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(324,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(325,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(327,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(328,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(334,31): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(171,1): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(172,1): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(173,1): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(174,1): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(181,32): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(84,26): warning C4101: 'dt' : variable locale non référencée
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(368,27): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(414,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(415,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(419,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(420,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(422,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(423,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(429,31): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
   ProjectData.vcxproj -> C:\Users\Thibaud\source\repos\ProjectData\Debug\ProjectData.exe
