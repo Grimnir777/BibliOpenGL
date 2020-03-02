@@ -14,6 +14,7 @@ public:
 	vector<string> get_first_2ls();
 	vector<string> get_first_words();
 	void fill_arrays(int year);
+	void refill_arrays(int year);
 	vector<string> first_ls;
 	vector<string> first_2ls;
 	vector<string> first_words;

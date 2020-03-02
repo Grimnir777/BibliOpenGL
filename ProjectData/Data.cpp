@@ -76,6 +76,51 @@ Data::Data(string path)
     cout << "Data Initialization succeed" << endl;
 }
 
+void Data::refill_arrays(int year) {
+    this->rootNode = new Node();
+    cout << "refill asked for year " << year << endl;
+    this->fill_arrays(year);
+    std::map<std::string, std::string> m;
+    for (int i = 0; i < this->resultsMulti.size(); i++)
+    {
+        m[this->resultsMulti[i][3]] = this->resultsMulti[i][4];
+    }
+
+    // Create tree
+    // Loop with every first letter
+    for (string first_l : this->first_ls)
+    {
+        // random color for every sub nodes
+        glm::vec3 randColor = glm::vec3(
+            static_cast <float> (rand()) / static_cast <float> (RAND_MAX),
+            static_cast <float> (rand()) / static_cast <float> (RAND_MAX),
+            static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+
+        Node* flNode = new Node(randColor, first_l);
+
+        // Loop with every first and second letter
+        for (string first_2l : this->first_2ls)
+        {
+            if (first_l.compare(first_2l.substr(0, 1)) == 0) {
+                //std::cout << first_2l.substr(0, 1) << endl;
+                Node* f2lNode = new  Node(randColor, first_2l);
+
+                // Loop with every first word
+                for (string first_word : this->first_words) {
+                    if (first_2l.compare(first_word.substr(0, 2)) == 0) {
+                        Node* wordNode = new Node(randColor, first_word, m[first_word]);
+                        f2lNode->AddChild(wordNode);
+                    }
+                }
+
+                flNode->AddChild(f2lNode);
+            }
+        }
+        this->rootNode->AddChild(flNode);
+    }
+    cout << "Data Initialization succeed" << endl;
+}
+
 
 Data::~Data()
 {

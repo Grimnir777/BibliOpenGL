@@ -138,6 +138,7 @@ private:
     vector<unsigned int> VAOsArc;
     vector<glm::vec3> colors;
     Node* actualNode;
+    int year = 2015;
 
     vector<glm::vec3> fillVerticesArc(float offsetAngle, float angle, float radius, float prof,float startHigh, float high) {
         float radiusWithProf = radius + prof;
@@ -546,6 +547,28 @@ private:
                     cout << "[" << i << "] ; Name : " << this->actualNode->children[i]->value << endl;
                 }
             }
+        }
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            this->year++;
+            cout << "Next year : " << this->year << endl;
+            this->data.refill_arrays(this->year);
+            this->actualNode = this->data.rootNode;
+            cout << "Refilling the vertices ..." << endl;
+            this->clearBuffers();
+            this->fillScene(this->actualNode, 0.5, 0.5, 0.5);
+            cout << "Scene ready !" << endl;
+        }
+        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+        {
+            this->year--;
+            cout << "Previous year : " << this->year << endl;
+            this->data.refill_arrays(this->year);
+            this->actualNode = this->data.rootNode;
+            cout << "Refilling the vertices ..." << endl;
+            this->clearBuffers();
+            this->fillScene(this->actualNode, 0.5, 0.5, 0.5);
+            cout << "Scene ready !" << endl;
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_RELEASE) {
             if (this->angleToReach < 360) {
