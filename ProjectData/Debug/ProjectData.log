@@ -1,13 +1,15 @@
 ﻿  Source.cpp
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(171,1): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(181,32): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(112,32): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
 C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(84,26): warning C4101: 'dt' : variable locale non référencée
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(495,27): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(541,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(542,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(546,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(547,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(549,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(550,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(556,31): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(411,27): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(537,35): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(580,31): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(618,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(619,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(623,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(624,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(626,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(627,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(633,31): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+LINK : warning LNK4098: conflit entre la bibliothÞque par dÚfaut 'MSVCRT' et les autres bibliothÞquesá; utilisez /NODEFAULTLIB:library
   ProjectData.vcxproj -> C:\Users\Thibaud\source\repos\ProjectData\Debug\ProjectData.exe

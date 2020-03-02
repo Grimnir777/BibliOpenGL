@@ -19,13 +19,14 @@
 //Others
 #include "sqlite3.h"
 
-using namespace std;
-
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window);
+
+
 // Settings
 const unsigned int SCR_WIDTH = 900;
 const unsigned int SCR_HEIGHT = 900;
@@ -35,18 +36,19 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 // Camera
-Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, 8.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(0.0f, 0.0f, 5.0f);
+
 
 class App
 {
 public:
     App() {
-        NB_segments = 120;
+        NB_segments = 10;
     }
     void run()
     {
@@ -79,8 +81,6 @@ public:
 
         glEnable(GL_DEPTH_TEST);
 
-
-
         double time = 0, dt;// Current time and enlapsed time
         double turn = 0;    // Model turn counter
         double speed = 0.3; // Model rotation speed
@@ -88,90 +88,21 @@ public:
         float bgColor[] = { 0.1f, 0.2f, 0.4f };         // Background color 
         unsigned char cubeColor[] = { 255, 0, 0, 128 }; // Model color (32bits RGBA)
 
-
-
-
         Shader objectShader("basic_shader.vs", "basic_shader.fs");
 
         Shader lampShader("lighting_shader.vs", "lighting_shader.fs");
 
 
+        // Set OpenGL options
+        //glEnable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        float vertices[] = {
-            -0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-
-            -0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-
-            -0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
-
-            -0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
-        };
-        // first, configure the cube's VAO (and VBO)
-        unsigned int VBO, cubeVAO;
-        glGenVertexArrays(1, &cubeVAO);
-        glGenBuffers(1, &VBO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        glBindVertexArray(cubeVAO);
-
-        // position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-        unsigned int lightVAO;
-        glGenVertexArrays(1, &lightVAO);
-        glBindVertexArray(lightVAO);
-
-        // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-
-        addArc(0, 45, 0.5, 0.2, 0.2);
-        //addArc(50, 45, 0.5, 0.2, 0.2);
-        //addArc(100, 45, 0.5, 0.2, 0.2);
-        //addArc(150, 45, 0.5, 0.2, 0.2);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        
+        this->actualNode = this->data.rootNode;
+        fillScene(this->actualNode, 0.5, 0.5, 0.5);
 
         objectShader.use();
 
@@ -186,26 +117,6 @@ public:
 
             glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-
-            // view/projection transformations
-            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-            glm::mat4 view = camera.GetViewMatrix();
-
-            // world transformation
-            glm::mat4 model = glm::mat4(1.0f);
-
-            // also draw the lamp object
-            lampShader.use();
-            lampShader.setMat4("projection", projection);
-            lampShader.setMat4("view", view);
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, lightPos);
-            model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-            lampShader.setMat4("model", model);
-
-            glBindVertexArray(lightVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
 
             renderAll(objectShader);
 
@@ -213,37 +124,45 @@ public:
             glfwPollEvents();
         }
 
-        glDeleteVertexArrays(1, &cubeVAO);
-        glDeleteVertexArrays(1, &lightVAO);
-        glDeleteBuffers(1, &VBO);
-
         glfwTerminate();
     }
 
 private:
-    // VARIABLES
-
-    // Data data = Data("articles_data.db");
+    // Variables
+    Data data = Data("articles_data.db");
     int NB_segments;
+    float angleToReach = 0.0f;
+    float actualAngle = 0.0f;
 
     vector<unsigned int> VBOsArc;
     vector<unsigned int> VAOsArc;
-    vector<unsigned int> EBOsArc;
+    vector<glm::vec3> colors;
+    Node* actualNode;
 
-
-
-    vector<glm::vec3> fillVerticesArc(float offsetAngle, float angle, float radius, float prof, float high) {
+    vector<glm::vec3> fillVerticesArc(float offsetAngle, float angle, float radius, float prof,float startHigh, float high) {
         float radiusWithProf = radius + prof;
         float realOffset = 3.1415926f * offsetAngle / 180;
-        float realAngle = 2.0f * 3.1415926f * angle / 180;
+        float realAngle = 3.1415926f * angle / 180;
         vector<glm::vec3> points;
         vector<glm::vec3> finalVertices;
         for (int i = 0; i < NB_segments; i++)
         {
-            points.push_back(glm::vec3((radius * cos((i * realAngle / NB_segments) + realOffset)), (radius * sin((i * realAngle / NB_segments) + realOffset)), 0.0f));
-            points.push_back(glm::vec3((radiusWithProf * cos((i * realAngle / NB_segments) + realOffset)), (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset)), 0.0f));
-            points.push_back(glm::vec3((radius * cos((i * realAngle / NB_segments) + realOffset)), (radius * sin((i * realAngle / NB_segments) + realOffset)), high));
-            points.push_back(glm::vec3((radiusWithProf * cos((i * realAngle / NB_segments) + realOffset)), (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset)), high));
+            points.push_back(glm::vec3(
+                (radius * cos((i * realAngle / NB_segments) + realOffset)),
+                (radius * sin((i * realAngle / NB_segments) + realOffset)),
+                startHigh));
+            points.push_back(glm::vec3(
+                (radiusWithProf * cos((i * realAngle / NB_segments) + realOffset)),
+                (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset)),
+                startHigh));
+            points.push_back(glm::vec3(
+                (radius * cos((i * realAngle / NB_segments) + realOffset)),
+                (radius * sin((i * realAngle / NB_segments) + realOffset)),
+                high+ startHigh));
+            points.push_back(glm::vec3(
+                (radiusWithProf * cos((i * realAngle / NB_segments) + realOffset)),
+                (radiusWithProf * sin((i * realAngle / NB_segments) + realOffset)),
+                high + startHigh));
         }
 
         //Side of arc #1
@@ -273,7 +192,6 @@ private:
 
         for (int i = 0; i < NB_segments - 1 ; i++)
         {
-            cout << "itération : " << i << endl;
             // Pour 1 Segment : 8 triangles
                 // Pour 1 triangle : 3 vertices 
                     // Pour 1 vertices 3 composants x,y,z et 3 comp de la normale x,y,z
@@ -378,7 +296,7 @@ private:
 
         }
 
-        //Side of arc #1
+        //Side of arc #last One
         n = this->normal(points.at(((NB_segments-1) * 4) + 1) - points.at(((NB_segments - 1) * 4) + 0), points.at(((NB_segments - 1) * 4) + 2) - points.at(((NB_segments - 1) * 4) + 0));
         // Fill
         finalVertices.push_back(points.at(((NB_segments - 1) * 4) + 0));
@@ -409,47 +327,19 @@ private:
         return glm::normalize(glm::cross(v1, v2));
     }
 
-    void mapVerticesToBuffers(float* vertices, int size_of_vertices, int* indexes, int size_of_indexes) {
-        glGenBuffers(1, &this->VBOsArc.back());
-        glGenBuffers(1, &this->EBOsArc.back());
-        glGenVertexArrays(1, &this->VAOsArc.back());
-
-        glBindBuffer(GL_ARRAY_BUFFER, this->VBOsArc.back());
-        glBufferData(GL_ARRAY_BUFFER, size_of_vertices, vertices, GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBOsArc.back());
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, size_of_indexes, indexes, GL_STATIC_DRAW);
-
-        glBindVertexArray(this->VAOsArc.back());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        //unbind 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
-
-
     void addArc(
         float offset_angle,
         float angle,
         float radius,
         float prof,
+        float startHigh,
         float high
     ) {
 
         this->VBOsArc.push_back(0);
         this->VAOsArc.push_back(0);
-       // this->EBOsArc.push_back(0);
 
-        //int size_vertices = this->NB_segments * 3 * 4; // 3D and 4 points per iteration
-        //int size_indexes = this->NB_segments * 8 * 3;  // 8 triangles composed by 3 point indexes
-
-       // cout << "Arc params ; size_vertices :  " << size_vertices << " ; size_indexes :  " << size_indexes;
-        //float* verticesArc = new float[size_vertices];
-        //int* indexesArc = new int[size_indexes];
-
-        vector<glm::vec3> vertices = fillVerticesArc(offset_angle, angle, radius, prof, high);
+        vector<glm::vec3> vertices = fillVerticesArc(offset_angle, angle, radius, prof, startHigh, high);
         glGenBuffers(1, &this->VBOsArc.back());
         glGenVertexArrays(1, &this->VAOsArc.back());
 
@@ -469,18 +359,44 @@ private:
         //unbind 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-        /*
-        mapVerticesToBuffers(
-            verticesArc,
-            (size_vertices * sizeof(float)),
-            indexesArc,
-            (size_indexes * sizeof(int)));
-        */
+    }
+
+    float makeArcs(
+        int nbArc,
+        float startAngle,
+        float endAngle,
+        float radius,
+        float prof,
+        float startHigh,
+        float high) {
+
+        float arcAngle = (float)(endAngle - startAngle) / nbArc;
+        for (int i = 0; i < nbArc; i++)
+        {
+            addArc((i * arcAngle) + startAngle, (arcAngle)-(arcAngle / 5), radius, prof, startHigh, high);
+        }
+        return arcAngle;
+    }
+
+    void makeArcsVertical(
+        int nbArc,
+        float startAngle,
+        float endAngle,
+        float radius,
+        float prof,
+        float startHigh,
+        float high) {
+        float diffAngle = (endAngle - startAngle);
+        float highLevel = (high-startHigh) / nbArc;
+        for (int i = 0; i < nbArc; i++)
+        {
+            addArc(startAngle, diffAngle, radius, prof, (highLevel * i) , highLevel - (highLevel/5));
+        }
     }
 
     void renderAll(Shader ourShader) {
         ourShader.use();
-        ourShader.setVec3("objectColor", glm::vec3(0.34f, 0.27f, 0.48f));
+        
         ourShader.setVec3("lightColor", glm::vec3(1.0f));
         ourShader.setVec3("lightPos", lightPos);
         ourShader.setVec3("viewPos", camera.Position);
@@ -494,42 +410,203 @@ private:
 
         for (int i = 0; i < VBOsArc.size(); i++)
         {
+            ourShader.setVec3("objectColor", this->colors.at(i));
             glBindVertexArray(VAOsArc.at(i));
-            //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOsArc.at(i));
 
             // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
             model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-            float angle = 0;
-            //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 1.0f, 1.0f));
+            if (this->angleToReach != this->actualAngle) {
+                cout << "To reach" << this->angleToReach << endl;
+                cout << "actual" << this->actualAngle << endl;
+                if (this->actualAngle < this->angleToReach) {
+                    this->actualAngle += 1;
+                }
+                else {
+                    this->actualAngle -= 1;
+                }
+            }
+            model = glm::rotate(model, glm::radians(this->actualAngle), glm::vec3(0.0f, 0.0f, 1.0f));
             ourShader.setMat4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 3*8 * 120);
-            //glDrawElements(GL_TRIANGLES, (NB_segments * 24), GL_UNSIGNED_INT, 0);
         }
+    }
+    void fillScene(
+        Node* node,
+        float radius,
+        float prof,
+        float high)
+    {
+        int levSize = node->children.size();
+        makeArcs(levSize, 0, 360, radius, prof, 0.0f, high);
+        for (int i = 0; i < levSize; i++)
+        {
+            this->colors.push_back(node->children[i]->color);
+        }
+        /*
+        // 1st level letter
+        int levSize = this->data.rootNode.children.size();
+        float  firstLetterAngle = makeArcs(levSize, 0, 360, radius, prof,0.0f, high);
+        for (int i = 0; i < levSize; i++)
+        {
+            this->colors.push_back(this->data.rootNode.children[i]->color);
+        }
+        //
+        for (int indexFirst2L = 0; indexFirst2L < levSize; indexFirst2L++)
+        {
+            Node* first2LNode = this->data.rootNode.children[indexFirst2L];
+            int first2LSize = first2LNode->children.size();
+
+            if (first2LSize > 0) {
+                float startAngleSecondLetter = (indexFirst2L * firstLetterAngle);
+                float endAngleSecondLetter = ((indexFirst2L+1) * firstLetterAngle) - (firstLetterAngle / 5);
+                
+                float secondLetterAngle = makeArcs(
+                    first2LSize,
+                    startAngleSecondLetter,
+                    endAngleSecondLetter,
+                    radius + prof + (prof/5),
+                    prof,
+                    0.0f,
+                    high);
+                for (int i = 0; i < first2LSize; i++)
+                {
+                    this->colors.push_back(first2LNode->color);
+                }
+                
+                // words 
+                for (int indexWord = 0; indexWord < first2LSize; indexWord++)
+                {
+                    Node* wordNode = first2LNode->children[indexWord];
+                    int wordSize = wordNode->children.size();
+                    if (wordSize > 0)
+                    {
+                        makeArcsVertical(
+                            wordSize,
+                            startAngleSecondLetter,
+                            endAngleSecondLetter,
+                            radius + (2* prof) + 2 * (prof / 5),
+                            prof,
+                            0.0f,
+                            high);
+                        for (int i = 0; i < wordSize; i++)
+                        {
+                            this->colors.push_back(wordNode->color);
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        */
+    }
+    void clearBuffers() {
+        for (size_t i = 0; i < this->VAOsArc.size(); i++)
+        {
+            glDeleteVertexArrays(1, &this->VAOsArc[i]);
+        }
+        for (size_t i = 0; i < this->VBOsArc.size(); i++)
+        {
+            glDeleteBuffers(1, &this->VBOsArc[i]);
+        }
+    }
+    
+    void processInput(GLFWwindow* window)
+    {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camera.ProcessKeyboard(FORWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camera.ProcessKeyboard(BACKWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camera.ProcessKeyboard(LEFT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camera.ProcessKeyboard(RIGHT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        {
+            if (this->actualNode->IsLeaf())
+            {
+                cout << "You are at lead level you cannot go forward" << endl;
+            }
+            else {
+                cout << "Please choose a node to visit by its index: " << endl;
+                for (int i = 0; i < this->actualNode->children.size(); i++)
+                {
+                    cout <<  "[" << i << "] : " << this->actualNode->children[i]->value << endl;
+                }
+                int choice;
+                cout << "Please enter your choice : ";
+                cin >> choice;
+                this->actualNode = this->actualNode->children[choice];
+                this->clearBuffers();
+                cout << "Refilling the vertices ..." << endl;
+                this->fillScene(this->actualNode, 0.5, 0.5, 0.5);
+                cout << "Scene ready !" << endl;
+            }
+            
+        }
+        if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+        {
+            if (this->actualNode->IsRoot()) 
+            {
+                cout << "You are at root level you cannot go back" << endl;
+            }
+            else {
+                this->actualNode = this->actualNode->parent;
+                cout << "Back to the previous level : " << this->actualNode->value << endl;
+            }
+            cout << "Refilling the vertices ..." << endl;
+            this->clearBuffers();
+            this->fillScene(this->actualNode, 0.5, 0.5, 0.5);
+            cout << "Scene ready !" << endl;
+        }
+        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+        {
+            cout << "--- Help ---" << endl;
+            cout << "Type Z/Q/S/D to move yourself into the scene" << endl;
+            cout << "You can also zoom with the mouse wheel and look around with the mouse\n" << endl;
+            cout << "Type G to choose a new node to visit" << endl;
+            cout << "Type B to go to previous node visited" << endl;
+            cout << "Type I to print infos about current visualization" << endl;
+            cout << "--- Help ---" << endl;
+        }
+        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+        {
+            cout << "Infos about current state : " << endl;
+            for (int i = 0; i < this->actualNode->children.size(); i++)
+            {
+                if (this->actualNode->children[i]->count != -1) {
+                    cout << "[" << i << "] ; Name : " << this->actualNode->children[i]->value << " ; Value : " << this->actualNode->children[i]->count << endl;
+                }
+                else {
+                    cout << "[" << i << "] ; Name : " << this->actualNode->children[i]->value << endl;
+                }
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_RELEASE) {
+            if (this->angleToReach < 360) {
+                this->angleToReach += 1;
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_RELEASE) {
+            if (this->angleToReach > 0) {
+                this->angleToReach -= 1;
+            }
+        }
+            
     }
 
 };
-
-
 
 /*
     -- External --
     Window and camera callbacks
 */
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);

@@ -1,12 +1,11 @@
 #include "Data.h"
 #include <iostream>
 #include <fstream>
-#include "sqlite3.h"
-using namespace std;
+#include <map>
 
 Data::Data(string path)
 {
-	cout << "Data constructor called";
+    cout << "Data Initialization" << endl;
 	this->dir = path;
     cout << this->dir <<"\n";
     int exit = 0;
@@ -17,9 +16,64 @@ Data::Data(string path)
     }
     else
         std::cout << "Opened Database Successfully!" << std::endl;
+    
+    this->fill_arrays(2015);
     this->first_ls = this->get_first_ls();
     this->first_2ls = this->get_first_2ls();
     this->first_words = this->get_first_words();
+
+    //std::cout << "Size 1st " << this->first_ls.size() << std::endl;
+    //std::cout << "Size 2nd " << this->first_2ls.size() << std::endl;
+    //std::cout << "Size words " << this->first_words.size() << std::endl;
+
+    /*
+        0 : fos name
+        1 : first_l 
+        2 : first_2l
+        3 : first_w
+        4 : count of fos
+    */
+    
+    std::map<std::string, std::string> m;
+    for (int i = 0; i < this->resultsMulti.size(); i++)
+    {
+        m[this->resultsMulti[i][3]] = this->resultsMulti[i][4];
+    }
+    
+
+    // Create tree
+    // Loop with every first letter
+    for (string first_l : this->first_ls)
+    {
+        // random color for every sub nodes
+        glm::vec3 randColor = glm::vec3(
+            static_cast <float> (rand()) / static_cast <float> (RAND_MAX),
+            static_cast <float> (rand()) / static_cast <float> (RAND_MAX),
+            static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+
+        Node* flNode = new Node(randColor, first_l);
+
+        // Loop with every first and second letter
+        for (string first_2l : this->first_2ls)
+        {
+            if (first_l.compare(first_2l.substr(0, 1)) == 0) {
+                //std::cout << first_2l.substr(0, 1) << endl;
+                Node* f2lNode = new  Node(randColor, first_2l);
+                
+                // Loop with every first word
+                for (string first_word : this->first_words) {
+                    if (first_2l.compare(first_word.substr(0, 2)) == 0) {
+                        Node* wordNode = new Node(randColor, first_word, m[first_word]);
+                        f2lNode->AddChild(wordNode);
+                    }
+                }
+                
+                flNode->AddChild(f2lNode);
+            }
+        }
+        this->rootNode->AddChild(flNode);
+    }
+    cout << "Data Initialization succeed" << endl;
 }
 
 
@@ -27,6 +81,36 @@ Data::~Data()
 {
     cout << "Data destructor called";
     sqlite3_close(this->DB);
+}
+
+// With multi results
+static int callbackDBMulti(void* ptr, int argc, char** argv, char** cols)
+{
+    vector<vector<string>>* vec = static_cast<vector<vector<string>>*>(ptr);
+
+    vector<string> row;
+    for (int i = 0; i < argc; i++)
+        row.push_back(argv[i] ? argv[i] : "(NULL)");
+    vec->push_back(row);
+    return 0;
+}
+
+void Data::executeSQLMulti(const char* sql)
+{
+    char* zErrMsg = 0;
+    int rc;
+    const char* data = "Callback function called";
+
+    /* Execute SQL statement */
+    rc = sqlite3_exec(this->DB, sql, callbackDBMulti, &this->resultsMulti, &zErrMsg);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+    else {
+        fprintf(stdout, "Operation done successfully\n");
+    }
 }
 
 static int callbackDB(void* ptr, int argc, char** argv, char** cols)
@@ -88,50 +172,16 @@ vector<string> Data::get_first_words()
     return this->results;
 }
 
-
-/*
-vector<string> Data::get_first_ls(int year)
+void Data::fill_arrays(int year)
 {
     this->results.clear();
     string sql;
     const char* part1 = R"""(
-                select first_l from fos 
+                select fos.name, fos.first_l, first_2l, first_word, count(*) from fos 
                 inner join fos_of_articles as fa on fos.name = fa.name 
                 inner join articles as a on fa.article_id = a.id )""";
     string part2 = "where a.year = " + to_string(year) + " ";
-    string part3 = "group by fos.first_l order by fos.first_l";
-    sql = part1 + part2 + part3;
-    this->executeSQL(sql.c_str());
-    return this->results;
-}
-
-vector<string> Data::get_first_2ls(int year, string first_l)
-{
-    this->results.clear();
-    string sql;
-    const char* part1= R"""(
-                select first_2l from fos 
-                inner join fos_of_articles as fa on fos.name = fa.name 
-                inner join articles as a on fa.article_id = a.id )""";
-    string part2 = "where a.year = " + to_string(year) + " and fos.first_l like '" + first_l + "' ";
-    string part3 = "group by fos.first_2l order by fos.first_2l";
-    sql = part1 + part2 + part3;
-    this->executeSQL(sql.c_str());
-    return this->results;
-}
-
-vector<string> Data::get_first_words(int year, string first_2l)
-{
-    this->results.clear();
-    string sql;
-    const char* part1 = R"""(
-                select fos.first_word from fos 
-                inner join fos_of_articles as fa on fos.name = fa.name 
-                inner join articles as a on fa.article_id = a.id )""";
-    string part2 = "where a.year = " + to_string(year) + " and fos.first_2l like '" + first_2l + "' ";
     string part3 = "group by fos.first_word order by fos.first_word";
     sql = part1 + part2 + part3;
-    this->executeSQL(sql.c_str());
-    return this->results;
+    this->executeSQLMulti(sql.c_str());
 }
-*/
