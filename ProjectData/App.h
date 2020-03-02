@@ -36,7 +36,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 // Camera
-Camera camera = Camera(glm::vec3(0.0f, 0.0f, 8.0f));
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -362,36 +362,50 @@ private:
     }
 
     float makeArcs(
-        int nbArc,
         float startAngle,
         float endAngle,
         float radius,
         float prof,
         float startHigh,
         float high) {
-
+        int nbArc = this->actualNode->children.size();
         float arcAngle = (float)(endAngle - startAngle) / nbArc;
         for (int i = 0; i < nbArc; i++)
         {
             addArc((i * arcAngle) + startAngle, (arcAngle)-(arcAngle / 5), radius, prof, startHigh, high);
+            this->colors.push_back(this->actualNode->children[i]->color);
         }
         return arcAngle;
     }
 
-    void makeArcsVertical(
-        int nbArc,
+    void makeArcsLeaf(
         float startAngle,
         float endAngle,
         float radius,
-        float prof,
         float startHigh,
         float high) {
-        float diffAngle = (endAngle - startAngle);
-        float highLevel = (high-startHigh) / nbArc;
+        int nbArc = this->actualNode->children.size();
+        float arcAngle = (float)(endAngle - startAngle) / nbArc;
+
+        int min = 10000;
+        int max = -10000;
         for (int i = 0; i < nbArc; i++)
         {
-            addArc(startAngle, diffAngle, radius, prof, (highLevel * i) , highLevel - (highLevel/5));
+            int val = this->actualNode->children[i]->count;
+            if (val > max) max = val;
+            if (val < min) min = val;
         }
+        cout << max << endl;
+        cout << min << endl;
+        int divide = (max - min);
+        for (int i = 0; i < nbArc; i++)
+        {
+            float countNormalized = (float) 0.5 * (this->actualNode->children[i]->count - min) / divide;
+            cout << countNormalized << endl;
+            addArc((i * arcAngle) + startAngle, (arcAngle)-(arcAngle / 5), radius, countNormalized, startHigh, high);
+            this->colors.push_back(this->actualNode->children[i]->color);
+        }
+
     }
 
     void renderAll(Shader ourShader) {
@@ -438,70 +452,16 @@ private:
         float prof,
         float high)
     {
+
         int levSize = node->children.size();
-        makeArcs(levSize, 0, 360, radius, prof, 0.0f, high);
-        for (int i = 0; i < levSize; i++)
-        {
-            this->colors.push_back(node->children[i]->color);
-        }
-        /*
-        // 1st level letter
-        int levSize = this->data.rootNode.children.size();
-        float  firstLetterAngle = makeArcs(levSize, 0, 360, radius, prof,0.0f, high);
-        for (int i = 0; i < levSize; i++)
-        {
-            this->colors.push_back(this->data.rootNode.children[i]->color);
-        }
-        //
-        for (int indexFirst2L = 0; indexFirst2L < levSize; indexFirst2L++)
-        {
-            Node* first2LNode = this->data.rootNode.children[indexFirst2L];
-            int first2LSize = first2LNode->children.size();
-
-            if (first2LSize > 0) {
-                float startAngleSecondLetter = (indexFirst2L * firstLetterAngle);
-                float endAngleSecondLetter = ((indexFirst2L+1) * firstLetterAngle) - (firstLetterAngle / 5);
-                
-                float secondLetterAngle = makeArcs(
-                    first2LSize,
-                    startAngleSecondLetter,
-                    endAngleSecondLetter,
-                    radius + prof + (prof/5),
-                    prof,
-                    0.0f,
-                    high);
-                for (int i = 0; i < first2LSize; i++)
-                {
-                    this->colors.push_back(first2LNode->color);
-                }
-                
-                // words 
-                for (int indexWord = 0; indexWord < first2LSize; indexWord++)
-                {
-                    Node* wordNode = first2LNode->children[indexWord];
-                    int wordSize = wordNode->children.size();
-                    if (wordSize > 0)
-                    {
-                        makeArcsVertical(
-                            wordSize,
-                            startAngleSecondLetter,
-                            endAngleSecondLetter,
-                            radius + (2* prof) + 2 * (prof / 5),
-                            prof,
-                            0.0f,
-                            high);
-                        for (int i = 0; i < wordSize; i++)
-                        {
-                            this->colors.push_back(wordNode->color);
-                        }
-
-                    }
-                }
-
+        if (levSize > 0) {
+            if (node->children[0]->IsLeaf()) {
+                makeArcsLeaf(0, 360, radius, 0.0f, high);
+            }
+            else {
+                makeArcs(0, 360, radius, prof, 0.0f, high);
             }
         }
-
-        */
     }
     void clearBuffers() {
         for (size_t i = 0; i < this->VAOsArc.size(); i++)
