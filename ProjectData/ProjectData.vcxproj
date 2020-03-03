@@ -71,11 +71,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Thibaud\Documents\VSLibs\Include;C:\Users\Thibaud\source\repos\ProjectData\ProjectData\include\freetype\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Thibaud\Documents\VSLibs\Libraries;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -90,13 +92,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Thibaud\source\repos\ProjectData\ProjectData\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\include\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Thibaud\source\repos\ProjectData\ProjectData\include\freetype\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\include\freetype\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -105,10 +107,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\include\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\dependancies\include\freetype\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,13 +159,7 @@
     <ClCompile Include="sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="basic_shader.fs" />
-    <None Include="basic_shader.vs" />
-    <None Include="lighting_shader.fs" />
-    <None Include="lighting_shader.vs" />
     <None Include="packages.config" />
-    <None Include="text_shader.fs" />
-    <None Include="text_shader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />

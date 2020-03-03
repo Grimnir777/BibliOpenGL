@@ -19,8 +19,6 @@
 //Others
 #include "sqlite3.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -88,9 +86,9 @@ public:
         float bgColor[] = { 0.1f, 0.2f, 0.4f };         // Background color 
         unsigned char cubeColor[] = { 255, 0, 0, 128 }; // Model color (32bits RGBA)
 
-        Shader objectShader("basic_shader.vs", "basic_shader.fs");
+        Shader objectShader("shaders\\basic_shader.vs", "shaders\\basic_shader.fs");
 
-        Shader lampShader("lighting_shader.vs", "lighting_shader.fs");
+        Shader lampShader("shaders\\lighting_shader.vs", "shaders\\lighting_shader.fs");
 
 
         // Set OpenGL options
@@ -396,13 +394,10 @@ private:
             if (val > max) max = val;
             if (val < min) min = val;
         }
-        cout << max << endl;
-        cout << min << endl;
         int divide = (max - min);
         for (int i = 0; i < nbArc; i++)
         {
             float countNormalized = (float) 0.5 * (this->actualNode->children[i]->count - min) / divide;
-            cout << countNormalized << endl;
             addArc((i * arcAngle) + startAngle, (arcAngle)-(arcAngle / 5), radius, countNormalized, startHigh, high);
             this->colors.push_back(this->actualNode->children[i]->color);
         }

@@ -1,14 +1,18 @@
 ﻿  Source.cpp
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(112,32): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(84,26): warning C4101: 'dt' : variable locale non référencée
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(426,27): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(498,35): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(541,31): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(601,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(602,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(606,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(607,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(609,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(610,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Thibaud\source\repos\ProjectData\ProjectData\App.h(616,31): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-  ProjectData.vcxproj -> C:\Users\Thibaud\source\repos\ProjectData\Debug\ProjectData.exe
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(110,32): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(82,26): warning C4101: 'dt' : variable locale non référencée
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(421,27): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(493,35): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(536,31): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(596,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(597,17): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(601,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(602,19): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(604,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(605,13): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\ProjectData\App.h(611,31): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+  glad.c
+  sqlite3.c
+  Génération de code en cours...
+LINK : warning LNK4098: conflit entre la bibliothÞque par dÚfaut 'MSVCRT' et les autres bibliothÞquesá; utilisez /NODEFAULTLIB:library
+  ProjectData.vcxproj -> C:\Users\Thibaud\Documents\GitHub\BibliOpenGL\Debug\ProjectData.exe
